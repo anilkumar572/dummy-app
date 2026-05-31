@@ -1,0 +1,42 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout dummy-app
+        uses: actions/checkout@v4
+        with:
+          path: dummy-app
+
+      - name: Checkout dummy-packages
+        uses: actions/checkout@v4
+        with:
+          repository: anilkumar572/dummy-packages
+          path: dummy-packages
+
+      - name: Build site
+        run: |
+          mkdir -p dist
+          MSG=$(cat dummy-packages/message.txt)
+          cat > dist/index.html << EOF
+          <!DOCTYPE html>
+          <html>
+          <body>
+            <h1>Multi-repo checkout works!</h1>
+            <p>$MSG</p>
+          </body>
+          </html>
+          EOF
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
